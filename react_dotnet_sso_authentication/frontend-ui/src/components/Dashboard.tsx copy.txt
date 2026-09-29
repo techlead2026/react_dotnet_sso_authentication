@@ -1,0 +1,159 @@
+// src/components/Dashboard.tsx
+import React, { useState } from "react";
+import type { BillItem } from "./types";
+import AddBillForm from "./AddBillForm";
+
+export default function Dashboard() {
+  // 1. STATE ANCHOR CORE (Equivalent to your running local memory dataset)
+  // We initialize it with 3 distinct placeholder records to visualize immediately
+  const [bills, setBills] = useState<BillItem[]>([
+    {
+      id: "1",
+      name: "Rent Allocation",
+      amount: 1200,
+      dueDate: "2026-10-01",
+      isPaid: false,
+      category: "Housing",
+    },
+    {
+      id: "2",
+      name: "AWS Cloud Sandbox",
+      amount: 45,
+      dueDate: "2026-10-05",
+      isPaid: true,
+      category: "Utilities",
+    },
+    {
+      id: "3",
+      name: "Internet / Fiber link",
+      amount: 60,
+      dueDate: "2026-10-10",
+      isPaid: false,
+      category: "Utilities",
+    },
+  ]);
+
+  // 2. COMPUTED METRICS LAYER (Calculated on the fly every time state transforms)
+  // This behaves exactly like running an in-memory LINQ calculation statement
+  const totalOwed = bills.reduce((sum, item) => sum + item.amount, 0);
+  const totalPaid = bills
+    .filter((item) => item.isPaid)
+    .reduce((sum, item) => sum + item.amount, 0);
+  const remainingCashObligation = totalOwed - totalPaid;
+  const handleAddBill = (
+    name: string,
+    amount: number,
+    dueDate: string,
+    category: string,
+  ) => {
+    const newRecord: BillItem = {
+      id: crypto.randomUUID(), // Generates an enterprise-standard structural unique GUID
+      name,
+      amount,
+      dueDate,
+      category,
+      isPaid: false,
+    };
+
+    // Immutability Enforced: Spread existing items snapshot and append the new entity configuration
+    setBills([...bills, newRecord]);
+  };
+
+  // 3. ACTION EVENT HANDLER MUTATOR
+  // Enforces clean immutability: generates a brand-new projection snapshot array pointer
+  const handleTogglePaidStatus = (id: string) => {
+    const updatedDataset = bills.map((bill) => {
+      if (bill.id === id) {
+        // Return a brand-new object instance mapping the inverse boolean property
+        return { ...bill, isPaid: !bill.isPaid };
+      }
+      return bill; // Return original pointer reference if unchanged
+    });
+
+    setBills(updatedDataset); // Replaces old array in memory, triggering React update loop
+  };
+
+  // 4. PRESENTATION DESIGN INTERFACE LAYOUT (Declarative Projection)
+  return (
+    <div
+      style={{
+        background: "#ffffff",
+        padding: "24px",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+      }}
+    >
+      <h2>Subscription & Runway Orchestrator Core</h2>
+
+      {/* Dynamic Summary readouts wrapping our computed analytical data metrics */}
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "24px",
+          background: "#f0f4f8",
+          padding: "16px",
+          borderRadius: "6px",
+        }}
+      >
+        <div>
+          <strong>Total Tracked Obligations:</strong> €{totalOwed}
+        </div>
+        <div>
+          <strong>Total Cleared/Paid:</strong> €{totalPaid}
+        </div>
+        <div
+          style={{ color: remainingCashObligation > 0 ? "#d32f2f" : "#2e7d32" }}
+        >
+          <strong>Remaining Cash Runway Drain:</strong> €
+          {remainingCashObligation}
+        </div>
+      </div>
+      <AddBillForm onAddBill={handleAddBill} />
+
+      <h3>Active Ledger Transactions</h3>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {/* LINQ Style Projection Loop using .map() to construct the dynamic row layout items */}
+        {bills.map((bill) => (
+          <div
+            key={bill.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "12px",
+              border: "1px solid #e0e0e0",
+              borderRadius: "4px",
+              backgroundColor: bill.isPaid ? "#e8f5e9" : "#ffffff",
+            }}
+          >
+            <div>
+              <strong>{bill.name}</strong>{" "}
+              <span style={{ fontSize: "0.85em", color: "#666" }}>
+                ({bill.category})
+              </span>
+              <br />
+              <span style={{ fontSize: "0.9em" }}>
+                Amount: €{bill.amount} | Due: {bill.dueDate}
+              </span>
+            </div>
+
+            <button
+              onClick={() => handleTogglePaidStatus(bill.id)}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: bill.isPaid ? "#2e7d32" : "#1976d2",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              {bill.isPaid ? "Mark Unpaid" : "Mark As Paid"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,20 @@
+## .NET / Visual Studio Build Artifacts
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.pdb
+.vs/
+.vscode/
+
+## React / Node Modules
+node_modules/
+dist/
+build/
+.env*.local
+
+## OS Files
+.DS_Store
+Thumbs.db
